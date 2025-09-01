@@ -3,9 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { data: session } = useSession();
 
   return (
     <nav className="bg-primary text-white shadow-md">
@@ -23,9 +25,23 @@ export default function Navbar() {
           <Link href="/register" className="hover:underline">
             Register
           </Link>
-          <Link href="/dashboard" className="hover:underline">
-            Dashboard
-          </Link>
+
+          {/* Show Dashboard only if logged in */}
+          {session && (
+            <Link href="/dashboard" className="hover:underline">
+              Dashboard
+            </Link>
+          )}
+
+          {/* Logout button when logged in */}
+          {session && (
+            <button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="hover:underline"
+            >
+              Logout
+            </button>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -47,9 +63,24 @@ export default function Navbar() {
             <Link href="/register" className="hover:underline" onClick={() => setIsOpen(false)}>
               Register
             </Link>
-            <Link href="/dashboard" className="hover:underline" onClick={() => setIsOpen(false)}>
-              Dashboard
-            </Link>
+
+            {session && (
+              <Link href="/dashboard" className="hover:underline" onClick={() => setIsOpen(false)}>
+                Dashboard
+              </Link>
+            )}
+
+            {session && (
+              <button
+                onClick={() => {
+                  signOut({ callbackUrl: "/" });
+                  setIsOpen(false);
+                }}
+                className="hover:underline"
+              >
+                Logout
+              </button>
+            )}
           </div>
         </div>
       )}
